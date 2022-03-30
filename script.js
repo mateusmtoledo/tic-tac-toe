@@ -21,17 +21,41 @@ const gameBoard = (() => {
         if (gameBoard.currentPosition[r][c]) return;
         gameBoard.currentPosition[r][c] = currentTurn;
         displayController.updateBoard(currentTurn, r, c);
+        if (checkForWin()) roundWinner = currentTurn;
         if (currentTurn === 'x') currentTurn = 'o';
         else currentTurn = 'x';
     };
 
+    const checkForWin = () => {
+        const pos = gameBoard.currentPosition;
+        const checkRow = num => {
+            if (!pos[num][0]) return;
+            if (pos[num][0] === pos[num][1] && pos[num][0] === pos[num][2]) return true;
+        }
+        const checkColumn = num => {
+            if (!pos[0][num]) return;
+            if (pos[0][num] === pos[1][num] && pos[0][num] === pos[2][num]) return true;
+        }
+        const checkDiagonal = num => {
+            if (num === 1) return;
+            if (!pos[num][num]) return;
+            const inc = num === 0 ? 1 : -1;
+            if (pos[num][num] === pos[num+inc][num+inc] &&
+                pos[num][num] === pos[num+2*inc][num+2*inc]) return true;
+        }
+        for (let i = 0; i < 3; i++) {
+            if (checkRow(i) || checkColumn(i) || checkDiagonal(i)) return true;
+        }
+    };
+
+    let roundWinner = '';
     let currentPosition = returnInitialPosition();
     let currentTurn = 'x';
 
-    return {currentTurn, play, currentPosition, clear};
+    return {currentTurn, play, currentPosition, clear, roundWinner};
 })();
 
-const displayController =(() => {
+const displayController = (() => {
     const container = document.querySelector('.container');
     const createBoard = () => {
         for (i = 0; i < 3; i++) {
