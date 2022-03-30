@@ -10,14 +10,29 @@ const gameBoard = (() => {
         return pos;
     };
 
-    const currentPosition = returnInitialPosition();
+    const clear = () => {
+        gameBoard.currentPosition = returnInitialPosition();
+        displayController.clear();
+    }
 
-    return {currentPosition};
+    const play = e => {
+        const r = e.target.dataset.row;
+        const c = e.target.dataset.column;
+        if (gameBoard.currentPosition[r][c]) return;
+        gameBoard.currentPosition[r][c] = currentTurn;
+        displayController.updateBoard(currentTurn, r, c);
+        if (currentTurn === 'x') currentTurn = 'o';
+        else currentTurn = 'x';
+    };
+
+    let currentPosition = returnInitialPosition();
+    let currentTurn = 'x';
+
+    return {currentTurn, play, currentPosition, clear};
 })();
 
 const displayController =(() => {
     const container = document.querySelector('.container');
-
     const createBoard = () => {
         for (i = 0; i < 3; i++) {
             for (j = 0; j < 3; j++) {
@@ -25,19 +40,42 @@ const displayController =(() => {
                 square.classList.add('square');
                 square.setAttribute('data-row', i);
                 square.setAttribute('data-column', j);
+                square.addEventListener('click', gameBoard.play);
                 container.appendChild(square);
             }
         }
     };
 
-    return {createBoard, container};
+    const updateBoard = (turn, r, c) => {
+        container.querySelector(`[data-row="${r}"][data-column="${c}"]`).textContent = turn;
+    }
+
+    const clear = () => {
+        for (let i = 0; i < 3; i++)
+            for (let j = 0; j < 3; j++)
+                container.querySelector(`[data-row="${i}"][data-column="${j}"]`).textContent = '';
+    }
+
+    return {createBoard, container, updateBoard, clear};
 })();
 
-const playerCreator = () => {
-    const score = 0;
-    const play = () => {
-    }
-    return {score, play};
+const playerCreator = (name) => {
+    let score = 0;
+    const getName = () => name;
+
+    return {getName, score};
 };
 
 displayController.createBoard();
+
+let playerName = '';
+while (!playerName) {
+    playerName = prompt('Enter the first player\'s name (X):');
+}
+const playerX = playerCreator(playerName);
+
+playerName = '';
+while(!playerName) {
+    playerName = prompt('Enter the second player\'s name (O):');
+}
+const playerO = playerCreator(playerName);
