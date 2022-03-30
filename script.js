@@ -47,13 +47,26 @@ const displayController =(() => {
     };
 
     const updateBoard = (turn, r, c) => {
-        container.querySelector(`[data-row="${r}"][data-column="${c}"]`).textContent = turn;
+        const sqr = container.querySelector(`[data-row="${r}"][data-column="${c}"]`);
+        if (turn === 'x') {
+            sqr.innerHTML = '&#10060;';
+            sqr.classList.add('cross');
+        }
+        else {
+            sqr.innerHTML = '&#8413;';
+            sqr.classList.add('circle');
+        }
     }
 
     const clear = () => {
-        for (let i = 0; i < 3; i++)
-            for (let j = 0; j < 3; j++)
-                container.querySelector(`[data-row="${i}"][data-column="${j}"]`).textContent = '';
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                const sqr = container.querySelector(`[data-row="${i}"][data-column="${j}"]`);
+                sqr.textContent = '';
+                sqr.classList.remove('cross');
+                sqr.classList.remove('circle');
+            }
+        }
     }
 
     return {createBoard, container, updateBoard, clear};
