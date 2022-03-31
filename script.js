@@ -13,7 +13,7 @@ const gameBoard = (() => {
     const clear = () => {
         gameBoard.currentPosition = returnInitialPosition();
         displayController.clear();
-    }
+    };
 
     const play = e => {
         const r = e.target.dataset.row;
@@ -21,7 +21,11 @@ const gameBoard = (() => {
         if (gameBoard.currentPosition[r][c]) return;
         gameBoard.currentPosition[r][c] = currentTurn;
         displayController.updateBoard(currentTurn, r, c);
-        if (checkForWin()) roundWinner = currentTurn;
+        if (checkForWin()) {
+            players.roundWinner = players[currentTurn];
+            players.roundWinner.score++;
+            displayController.toggleListeners();
+        }
         if (currentTurn === 'x') currentTurn = 'o';
         else currentTurn = 'x';
     };
@@ -48,7 +52,7 @@ const gameBoard = (() => {
         }
     };
 
-    let roundWinner = '';
+    let roundWinner = {};
     let currentPosition = returnInitialPosition();
     let currentTurn = 'x';
 
@@ -57,18 +61,42 @@ const gameBoard = (() => {
 
 const displayController = (() => {
     const container = document.querySelector('.container');
+
+    const squares = [];
+
     const createBoard = () => {
         for (i = 0; i < 3; i++) {
+            squares[i] = [];
             for (j = 0; j < 3; j++) {
-                const square = document.createElement('div');
-                square.classList.add('square');
-                square.setAttribute('data-row', i);
-                square.setAttribute('data-column', j);
-                square.addEventListener('click', gameBoard.play);
-                container.appendChild(square);
+                squares[i][j] = document.createElement('div');
+                squares[i][j].classList.add('square');
+                squares[i][j].setAttribute('data-row', i);
+                squares[i][j].setAttribute('data-column', j);
+                squares[i][j].addEventListener('click', gameBoard.play);
+                squares[i][j].setAttribute('data-listener', 1);
+                container.appendChild(squares[i][j]);
             }
         }
     };
+
+    const toggleListeners = () => {
+        if(squares[0][0].getAttribute('data-listener') == 1) {
+            for (let i = 0; i < 3 ; i++) {
+                for (let j = 0; j < 3; j++) {
+                    squares[i][j].removeEventListener('click', gameBoard.play);
+                    squares[i][j].setAttribute('data-listener', 0);
+                }
+            }
+        }
+        else {
+            for (let i = 0; i < 3 ; i++) {
+                for (let j = 0; j < 3; j++) {
+                    squares[i][j].addEventListener('click', gameBoard.play);
+                    squares[i][j].setAttribute('data-listener', 1);
+                }
+            }
+        }
+    }
 
     const updateBoard = (turn, r, c) => {
         const sqr = container.querySelector(`[data-row="${r}"][data-column="${c}"]`);
@@ -80,7 +108,7 @@ const displayController = (() => {
             sqr.innerHTML = '&#8413;';
             sqr.classList.add('circle');
         }
-    }
+    };
 
     const clear = () => {
         for (let i = 0; i < 3; i++) {
@@ -91,9 +119,9 @@ const displayController = (() => {
                 sqr.classList.remove('circle');
             }
         }
-    }
+    };
 
-    return {createBoard, container, updateBoard, clear};
+    return {createBoard, updateBoard, clear, toggleListeners};
 })();
 
 const playerCreator = (name) => {
@@ -105,14 +133,20 @@ const playerCreator = (name) => {
 
 displayController.createBoard();
 
-let playerName = '';
-while (!playerName) {
-    playerName = prompt('Enter the first player\'s name (X):');
-}
-const playerX = playerCreator(playerName);
+const players = (() => {
+    let playerName = '';
+    let roundWinner = {};
 
-playerName = '';
-while(!playerName) {
-    playerName = prompt('Enter the second player\'s name (O):');
-}
-const playerO = playerCreator(playerName);
+    while (!playerName) {
+        playerName = prompt('Enter the first player\'s name (X):');
+    }
+    const x = playerCreator(playerName);
+
+    playerName = '';
+    while(!playerName) {
+        playerName = prompt('Enter the second player\'s name (O):');
+    }
+    const o = playerCreator(playerName);
+
+    return {o, x, roundWinner};
+})();
