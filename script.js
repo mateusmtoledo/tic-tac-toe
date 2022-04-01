@@ -28,10 +28,12 @@ const gameBoard = (() => {
       displayController.updateScore();
       displayController.displayWinner(players.roundWinner);
       displayController.turn.textContent = '';
+      return;
     } else if (checkForDraw()) {
       displayController.toggleListeners();
       displayController.displayDrawMessage();
       displayController.turn.textContent = '';
+      return;
     }
     if (currentTurn === "x") currentTurn = "o";
     else currentTurn = "x";
