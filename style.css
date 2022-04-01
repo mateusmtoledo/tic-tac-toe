@@ -89,3 +89,11 @@ body {
     background-size: 80%;
     background-repeat: no-repeat;
 }
+
+button {
+    margin-top: 32px;
+    padding: 8px 16px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}

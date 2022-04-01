@@ -1,4 +1,6 @@
 const gameBoard = (() => {
+  let roundCounter = 0;
+
   const returnInitialPosition = () => {
     let pos = [];
     for (let i = 0; i < 3; i++) {
@@ -24,15 +26,19 @@ const gameBoard = (() => {
     if (checkForWin()) {
       players.roundWinner = players[currentTurn];
       players.roundWinner.score++;
+      gameBoard.roundCounter++;
       displayController.toggleListeners();
       displayController.updateScore();
       displayController.displayWinner(players.roundWinner);
-      displayController.turn.textContent = '';
+      displayController.turn.textContent = "";
+      displayController.toggleRestartButton();
       return;
     } else if (checkForDraw()) {
+      gameBoard.roundCounter++;
       displayController.toggleListeners();
       displayController.displayDrawMessage();
-      displayController.turn.textContent = '';
+      displayController.turn.textContent = "";
+      displayController.toggleRestartButton();
       return;
     }
     if (currentTurn === "x") currentTurn = "o";
@@ -62,13 +68,16 @@ const gameBoard = (() => {
     };
     const checkDiagonal = (num) => {
       if (num === 1) return;
-      if (!pos[num][num]) return;
-      const inc = num === 0 ? 1 : -1;
-      if (
-        pos[num][num] === pos[num + inc][num + inc] &&
-        pos[num][num] === pos[num + 2 * inc][num + 2 * inc]
-      )
-        return true;
+      if (!pos[0][num]) return;
+      if (num === 0) {
+        if (pos[0][0] === pos[1][1] && pos[0][0] === pos[2][2]) {
+          return true;
+        } else return;
+      } else if (num === 2) {
+        if (pos[0][2] === pos[1][1] && pos[0][2] === pos[2][0]) {
+          return true;
+        } else return;
+      }
     };
     for (let i = 0; i < 3; i++) {
       if (checkRow(i) || checkColumn(i) || checkDiagonal(i)) return true;
@@ -79,10 +88,18 @@ const gameBoard = (() => {
   let currentPosition = returnInitialPosition();
   let currentTurn = "x";
 
-  return { currentTurn, play, currentPosition, clear, roundWinner };
+  return {
+    currentTurn,
+    play,
+    currentPosition,
+    clear,
+    roundWinner,
+    roundCounter,
+  };
 })();
 
 const displayController = (() => {
+  const gameStatus = document.querySelector(".status");
   const winnerDiv = document.querySelector(".round-winner");
   const container = document.querySelector(".container");
   const squares = [];
@@ -123,9 +140,9 @@ const displayController = (() => {
   };
 
   const createBoard = () => {
-    for (i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i++) {
       squares[i] = [];
-      for (j = 0; j < 3; j++) {
+      for (let j = 0; j < 3; j++) {
         squares[i][j] = document.createElement("div");
         squares[i][j].classList.add("square");
         squares[i][j].setAttribute("data-row", i);
@@ -135,6 +152,35 @@ const displayController = (() => {
         container.appendChild(squares[i][j]);
       }
     }
+  };
+
+  const startGame = () => {
+    if (gameBoard.roundCounter === 0) {
+      displayController.displayNames();
+      displayController.createBoard();
+      displayController.updateScore();
+      displayController.updateTurn("x");
+    } else {
+      if (gameBoard.roundCounter % 2 === 0) gameBoard.currentTurn = "x";
+      else gameBoard.currentTurn = "o";
+      gameBoard.clear();
+      displayController.updateTurn(gameBoard.currentTurn);
+      displayController.toggleListeners();
+      displayController.toggleRestartButton();
+      displayController.winnerDiv.textContent = "";
+    }
+  };
+
+  const playAgain = (() => {
+    const button = document.createElement("button");
+    button.textContent = "Play Again";
+    button.addEventListener("click", startGame);
+    return button;
+  })();
+
+  const toggleRestartButton = () => {
+    if (playAgain.isConnected) gameStatus.removeChild(playAgain);
+    else gameStatus.appendChild(playAgain);
   };
 
   const toggleListeners = () => {
@@ -189,6 +235,9 @@ const displayController = (() => {
     displayNames,
     displayDrawMessage,
     turn,
+    startGame,
+    toggleRestartButton,
+    winnerDiv,
   };
 })();
 
@@ -218,7 +267,4 @@ const players = (() => {
   return { o, x, roundWinner };
 })();
 
-displayController.displayNames();
-displayController.createBoard();
-displayController.updateScore();
-displayController.updateTurn("x");
+displayController.startGame();
