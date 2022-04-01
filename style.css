@@ -69,11 +69,11 @@ body {
 }
 
 .cross {
-    color: #2563eb;
+    background-image: url(./images/cross.svg);
 }
 
 .circle {
-    color: #dc2626;
+    background-image: url(./images/circle.svg);
 }
 
 .square {
@@ -85,4 +85,7 @@ body {
     justify-content: center;
     text-align: center;
     font-size: 110px;
+    background-position: center;
+    background-size: 80%;
+    background-repeat: no-repeat;
 }

@@ -160,10 +160,8 @@ const displayController = (() => {
       `[data-row="${r}"][data-column="${c}"]`
     );
     if (turn === "x") {
-      sqr.innerHTML = "&#10060;";
       sqr.classList.add("cross");
     } else {
-      sqr.innerHTML = "&#8413;";
       sqr.classList.add("circle");
     }
   };
@@ -174,7 +172,6 @@ const displayController = (() => {
         const sqr = container.querySelector(
           `[data-row="${i}"][data-column="${j}"]`
         );
-        sqr.textContent = "";
         sqr.classList.remove("cross");
         sqr.classList.remove("circle");
       }
