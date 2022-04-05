@@ -12,6 +12,10 @@ const gameBoard = (() => {
     return pos;
   };
 
+  const changeTurn = (t) => {
+    currentTurn = t;
+  }
+
   const clear = () => {
     gameBoard.currentPosition = returnInitialPosition();
     displayController.clear();
@@ -95,6 +99,7 @@ const gameBoard = (() => {
     clear,
     roundWinner,
     roundCounter,
+    changeTurn,
   };
 })();
 
@@ -161,8 +166,8 @@ const displayController = (() => {
       displayController.updateScore();
       displayController.updateTurn("x");
     } else {
-      if (gameBoard.roundCounter % 2 === 0) gameBoard.currentTurn = "x";
-      else gameBoard.currentTurn = "o";
+      if (gameBoard.roundCounter % 2 === 0) gameBoard.changeTurn("x");
+      else gameBoard.changeTurn("o");
       gameBoard.clear();
       displayController.updateTurn(gameBoard.currentTurn);
       displayController.toggleListeners();
