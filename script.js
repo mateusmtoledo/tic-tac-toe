@@ -166,10 +166,15 @@ const displayController = (() => {
       displayController.updateScore();
       displayController.updateTurn("x");
     } else {
-      if (gameBoard.roundCounter % 2 === 0) gameBoard.changeTurn("x");
-      else gameBoard.changeTurn("o");
+      if (gameBoard.roundCounter % 2 === 0) {
+        gameBoard.changeTurn("x");
+        displayController.updateTurn("x");
+      }
+      else {
+        gameBoard.changeTurn("o");
+        displayController.updateTurn("o");
+      }
       gameBoard.clear();
-      displayController.updateTurn(gameBoard.currentTurn);
       displayController.toggleListeners();
       displayController.toggleRestartButton();
       displayController.winnerDiv.textContent = "";
